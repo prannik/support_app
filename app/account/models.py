@@ -49,7 +49,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
             'id': self.pk,
             'exp': int(dt.strftime('%s'))
         }, settings.SECRET_KEY, algorithm='HS256')
-        return token
+        return token.decode('utf-8')
 
     def has_perm(self, perm, obj=None):
         return self.is_superuser

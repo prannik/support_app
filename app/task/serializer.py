@@ -53,3 +53,16 @@ class RetrieveProblemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Problem
         fields = ('author', 'status_problem', 'title_problem', 'text_problem', 'date_publish', 'answers')
+
+
+class UpdateStatusProblemSerializer(serializers.ModelSerializer):
+    """ Serializer update status_problem  """
+    status_problem = serializers.ChoiceField(choices=Problem.Status)
+    author = serializers.CharField(read_only=True)
+    title_problem = serializers.CharField(read_only=True)
+    text_problem = serializers.CharField(read_only=True)
+    date_publish = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = Problem
+        fields = ('author', 'status_problem', 'title_problem', 'text_problem', 'date_publish')

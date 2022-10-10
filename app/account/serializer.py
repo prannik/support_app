@@ -36,3 +36,17 @@ class LogInSerializer(serializers.ModelSerializer):
         if not self.instance.check_password(attrs.get('password')):
             raise serializers.ValidationError({'password': 'Wrong password.'})
         return attrs
+
+
+class SignUpStaffSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(max_length=256)
+    password = serializers.CharField(max_length=128, min_length=8, write_only=True)
+    token = serializers.CharField(max_length=256, read_only=True)
+
+    class Meta:
+        model = get_user_model()
+        fields = ('username', 'email', 'first_name', 'last_name', 'password', 'token')
+
+    def create(self, validated_data):
+        self.instance = get_user_model().objects.create_staff(**validated_data)
+        return self.instance

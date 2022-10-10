@@ -1,7 +1,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from rest_framework.filters import SearchFilter
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 from rest_framework.viewsets import GenericViewSet
@@ -9,7 +9,7 @@ from rest_framework.viewsets import GenericViewSet
 from app.task.filters import ProblemFilter
 from app.task.models import Answer, Problem
 from app.task.serializer import (CreateAnswerSerializer, CreateProblemSerializer, ListAnswerSerializer,
-                                 ListProblemSerializer, RetrieveProblemSerializer)
+                                 ListProblemSerializer, RetrieveProblemSerializer, UpdateStatusProblemSerializer)
 
 
 class ProblemViewSet(GenericViewSet):
@@ -21,8 +21,9 @@ class ProblemViewSet(GenericViewSet):
         'create': CreateProblemSerializer,
         'list': ListProblemSerializer,
         'retrieve': RetrieveProblemSerializer,
+        'update': UpdateStatusProblemSerializer
     }
-    permission_classes = [IsAuthenticated]
+    permission_classes = {'update': IsAdminUser}
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -42,8 +43,19 @@ class ProblemViewSet(GenericViewSet):
         serializer = self.get_serializer(instance)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
     def get_serializer_class(self):
         return self.serializer_classes.get(self.action, Serializer)
+
+    def get_permissions(self):
+        permission_class = self.permission_classes.get(self.action, IsAuthenticated)
+        return [permission_class()]
 
 
 class AnswerViewSet(GenericViewSet):

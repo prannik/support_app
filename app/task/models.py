@@ -20,7 +20,7 @@ class Problem(models.Model):
         choices=Status.choices, default=Status.unresolved, verbose_name='Problem status')
 
     def __str__(self):
-        return f'{self.title_problem}'
+        return f'{self.title_problem} - Status:{self.status_problem}'
 
     class Meta:
         ordering = ('date_publish', )
