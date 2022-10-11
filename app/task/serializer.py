@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from app.task.models import Answer, Problem
+from app.task.task import send_update_status
 
 
 class CreateProblemSerializer(serializers.ModelSerializer):
@@ -66,3 +67,8 @@ class UpdateStatusProblemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Problem
         fields = ('author', 'status_problem', 'title_problem', 'text_problem', 'date_publish')
+
+    def update(self, instance, validated_data):
+        status = dict(Problem.Status.choices).get(instance.status_problem)
+        send_update_status.delay(instance.title_problem, status, instance.author.email)
+        return instance
