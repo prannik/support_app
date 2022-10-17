@@ -1,0 +1,67 @@
+version: '3.7'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: support_app_test_web
+    command: ./scripts/web_start.sh
+    expose:
+      - 8000
+    environment:
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+      DEBUG: ${DEBUG}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
+      CORS_ORIGIN_WHITELIST: ${CORS_ORIGIN_WHITELIST}
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_HOST: ${DATABASE_HOST}
+      POSTGRES_PORT: ${DATABASE_PORT}
+      CELERY_BROKER_URL: ${CELERY_BROKER_URL}
+      CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
+      EMAIL_HOST_USER: ${EMAIL_HOST_USER}
+      EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD}
+    depends_on:
+      - redis
+      - db
+
+  db:
+    image: postgres:alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+
+  redis:
+    image: redis:alpine
+
+  celery_worker:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: support_app_test_celery
+    command: ./scripts/celery_worker_start.sh
+    environment:
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+      DEBUG: ${DEBUG}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
+      CORS_ORIGIN_WHITELIST: ${CORS_ORIGIN_WHITELIST}
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_HOST: ${DATABASE_HOST}
+      POSTGRES_PORT: ${DATABASE_PORT}
+      CELERY_BROKER_URL: ${CELERY_BROKER_URL}
+      CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
+      EMAIL_HOST_USER: ${EMAIL_HOST_USER}
+      EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD}
+    depends_on:
+      - redis
+      - db
+
+volumes:
+  postgres_data:

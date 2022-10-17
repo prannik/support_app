@@ -13,7 +13,7 @@ SECRET_KEY = env('DJANGO_SECRET_KEY')
 
 DEBUG = env('DEBUG', default=False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 
 
 # Application definition
@@ -141,6 +141,11 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_WHITELIST = env.list('CORS_ORIGIN_WHITELIST')
+
 
 # Simple jwt settings
 SIMPLE_JWT = {
