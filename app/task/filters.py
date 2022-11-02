@@ -6,4 +6,4 @@ from app.task.models import Problem
 class ProblemFilter(FilterSet):
     class Meta:
         model = Problem
-        fields = ('status_problem', 'author')
+        fields = ('status', 'author')

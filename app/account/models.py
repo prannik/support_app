@@ -25,7 +25,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     class Meta:
-        ordering = ('is_active', )
         verbose_name = 'User'
         verbose_name_plural = 'Users'
 

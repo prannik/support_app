@@ -6,11 +6,10 @@ from app.task.task import send_update_status
 
 class CreateProblemSerializer(serializers.ModelSerializer):
     """ Serializer creation Question """
-    author = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Problem
-        fields = ('author', 'title_problem', 'text_problem')
+        fields = ('author', 'title', 'description')
 
     def create(self, validated_data):
         self.instance = Problem.objects.create(author=self.context['request'].user, **validated_data)
@@ -22,17 +21,16 @@ class ListProblemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Problem
-        fields = ('author', 'title_problem', 'status_problem', 'date_publish', 'id')
+        fields = ('author', 'title', 'status', 'date_created', 'id')
 
 
 class CreateAnswerSerializer(serializers.ModelSerializer):
     """ Serializer creation Answer """
-    author = serializers.PrimaryKeyRelatedField(read_only=True)
-    response_tag = serializers.SlugRelatedField(slug_field='pk', queryset=Problem.objects.all())
+    response_problem = serializers.SlugRelatedField(slug_field='pk', queryset=Problem.objects.all())
 
     class Meta:
         model = Answer
-        fields = ('author', 'text_discussion', 'response_tag')
+        fields = ('author', 'text', 'response_problem')
 
     def create(self, validated_data):
         self.instance = Answer.objects.create(author=self.context['request'].user, **validated_data)
@@ -44,7 +42,7 @@ class ListAnswerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Answer
-        fields = ('author', 'text_discussion', 'date_publish', 'response_tag')
+        fields = ('author', 'text', 'date_created', 'response_problem')
 
 
 class RetrieveProblemSerializer(serializers.ModelSerializer):
@@ -53,22 +51,22 @@ class RetrieveProblemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Problem
-        fields = ('author', 'status_problem', 'title_problem', 'text_problem', 'date_publish', 'answers')
+        fields = ('author', 'status', 'title', 'description', 'date_created', 'answers')
 
 
 class UpdateStatusProblemSerializer(serializers.ModelSerializer):
-    """ Serializer update status_problem  """
-    status_problem = serializers.ChoiceField(choices=Problem.Status)
+    """ Serializer update status  """
+    status = serializers.ChoiceField(choices=Problem.Status)
     author = serializers.CharField(read_only=True)
-    title_problem = serializers.CharField(read_only=True)
-    text_problem = serializers.CharField(read_only=True)
-    date_publish = serializers.CharField(read_only=True)
+    title = serializers.CharField(read_only=True)
+    description = serializers.CharField(read_only=True)
+    date_created = serializers.CharField(read_only=True)
 
     class Meta:
         model = Problem
-        fields = ('author', 'status_problem', 'title_problem', 'text_problem', 'date_publish')
+        fields = ('author', 'status', 'title', 'description', 'date_created')
 
     def update(self, instance, validated_data):
-        status = dict(Problem.Status.choices).get(instance.status_problem)
-        send_update_status.delay(instance.title_problem, status, instance.author.email)
+        status = dict(Problem.Status.choices).get(instance.status)
+        send_update_status.delay(instance.title, status, instance.author.email)
         return instance

@@ -8,15 +8,15 @@ from rest_framework.viewsets import GenericViewSet
 
 from app.task.filters import ProblemFilter
 from app.task.models import Answer, Problem
-from app.task.serializer import (CreateAnswerSerializer, CreateProblemSerializer, ListAnswerSerializer,
-                                 ListProblemSerializer, RetrieveProblemSerializer, UpdateStatusProblemSerializer)
+from app.task.serializers import (CreateAnswerSerializer, CreateProblemSerializer, ListAnswerSerializer,
+                                  ListProblemSerializer, RetrieveProblemSerializer, UpdateStatusProblemSerializer)
 
 
 class ProblemViewSet(GenericViewSet):
-    queryset = Problem.objects.all().order_by('date_publish')
+    queryset = Problem.objects.all().order_by('date_created')
     filter_backends = (DjangoFilterBackend, SearchFilter)
     filterset_class = ProblemFilter
-    search_fields = ('title_problem', 'text_problem')
+    search_fields = ('title', 'description')
     serializer_classes = {
         'create': CreateProblemSerializer,
         'list': ListProblemSerializer,
@@ -24,6 +24,13 @@ class ProblemViewSet(GenericViewSet):
         'update': UpdateStatusProblemSerializer
     }
     permission_classes = {'update': IsAdminUser}
+
+    def get_serializer_class(self):
+        return self.serializer_classes.get(self.action, Serializer)
+
+    def get_permissions(self):
+        permission_class = self.permission_classes.get(self.action, IsAuthenticated)
+        return [permission_class()]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -38,7 +45,7 @@ class ProblemViewSet(GenericViewSet):
 
     def retrieve(self, request, pk, *args, **kwargs):
         instance = self.get_object()
-        answers = Answer.objects.filter(response_tag=pk)
+        answers = Answer.objects.filter(response_problem=pk)
         instance.answers = answers
         serializer = self.get_serializer(instance)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -48,18 +55,11 @@ class ProblemViewSet(GenericViewSet):
         serializer = self.get_serializer(instance, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    def get_serializer_class(self):
-        return self.serializer_classes.get(self.action, Serializer)
-
-    def get_permissions(self):
-        permission_class = self.permission_classes.get(self.action, IsAuthenticated)
-        return [permission_class()]
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class AnswerViewSet(GenericViewSet):
-    queryset = Answer.objects.all().order_by('-date_publish')
+    queryset = Answer.objects.all().order_by('-date_created')
     permission_classes = [IsAuthenticated]
     serializer_classes = {
         'create': CreateAnswerSerializer,

@@ -5,7 +5,6 @@ from app.account.models import CustomUser
 
 
 class SignUpSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(max_length=256)
     password = serializers.CharField(max_length=128, min_length=8, write_only=True)
     token = serializers.CharField(max_length=256, read_only=True)
 
@@ -39,7 +38,6 @@ class LogInSerializer(serializers.ModelSerializer):
 
 
 class SignUpStaffSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(max_length=256)
     password = serializers.CharField(max_length=128, min_length=8, write_only=True)
     token = serializers.CharField(max_length=256, read_only=True)
 

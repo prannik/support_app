@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 from rest_framework.viewsets import GenericViewSet
 
-from app.account.serializer import LogInSerializer, SignUpSerializer, SignUpStaffSerializer
+from app.account.serializers import LogInSerializer, SignUpSerializer, SignUpStaffSerializer
 
 
 class AuthViewSet(GenericViewSet):
