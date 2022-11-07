@@ -5,7 +5,7 @@ from app.task.task import send_update_status
 
 
 class CreateProblemSerializer(serializers.ModelSerializer):
-    """ Serializer creation Question """
+    """ Serializer creating a Question """
 
     class Meta:
         model = Problem
@@ -25,7 +25,7 @@ class ListProblemSerializer(serializers.ModelSerializer):
 
 
 class CreateAnswerSerializer(serializers.ModelSerializer):
-    """ Serializer creation Answer """
+    """ Serializer creating a Answer """
     response_problem = serializers.SlugRelatedField(slug_field='pk', queryset=Problem.objects.all())
 
     class Meta:
@@ -46,7 +46,7 @@ class ListAnswerSerializer(serializers.ModelSerializer):
 
 
 class RetrieveProblemSerializer(serializers.ModelSerializer):
-    """ Serializer full specific question """
+    """ Certain question serializer """
     answers = ListAnswerSerializer(many=True, read_only=True)
 
     class Meta:

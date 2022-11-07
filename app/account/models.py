@@ -10,6 +10,7 @@ from app.account.managers import UserManager
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
+    """ General model user """
 
     first_name = models.CharField(max_length=128)
     last_name = models.CharField(max_length=128)

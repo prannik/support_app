@@ -4,7 +4,7 @@ from django.utils import timezone
 
 
 class Problem(models.Model):
-    """ User question model """
+    """ User`s question model """
 
     class Status(models.IntegerChoices):
         unresolved = 1, 'unresolved'
@@ -31,7 +31,7 @@ class Problem(models.Model):
 
 
 class Answer(models.Model):
-    """ Answer model of discussion"""
+    """ Answer model of discussion """
     objects = models.Manager()
     author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, verbose_name='Answer author')
     text = models.TextField(verbose_name='Discussion text')
